@@ -1,9 +1,11 @@
+import os
 import time
 import ctypes
 import numpy as np
 from pywinauto.application import Application
 import win32gui
 import win32api
+from openpyxl import load_workbook, Workbook  # 引入 Excel 處理庫
 
 # 確保高 DPI 螢幕真實實體座標精確
 ctypes.windll.shcore.SetProcessDpiAwareness(2)
@@ -17,10 +19,42 @@ def get_pixel_color(hdc, x, y):
     return (r, g, b)
 
 def is_color_changed(base_rgb, current_rgb):
-    """比對當前顏色與點擊前是否有顯著差異 (變化量 > 15 視為變色)"""
+    """比對當前顏色與點擊前是否有顯著差異"""
     return any(abs(b - c) > 15 for b, c in zip(base_rgb, current_rgb))
 
-def measure_color_change_time(total_cycles=5):
+def log_to_excel(file_name, cycle_num, all_records):
+    """檢查並寫入數據至 Excel 檔案的下一列空格"""
+    headers = ['輪次', '按鈕編號', '前鈕恢復時間(ms)', '新鈕變色時間(ms)', '總耗時(ms)']
+    
+    # 判斷檔案是否存在
+    if not os.path.exists(file_name):
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "測試結果"
+        ws.append(headers)  # 寫入標題列
+    else:
+        wb = load_workbook(file_name)
+        ws = wb.active
+
+    # 將這一輪(1~8顆按鈕)最新一次的數據接續寫入
+    for num in range(1, 9):
+        totals = all_records[num]["total"]
+        p_recovers = all_records[num]["prev_recover"]
+        c_changes = all_records[num]["curr_change"]
+        
+        if len(totals) >= cycle_num:  # 確保該輪有成功紀錄到數據
+            row_data = [
+                f"第 {cycle_num} 輪",
+                f"Btn {num}",
+                round(p_recovers[cycle_num - 1], 2),
+                round(c_changes[cycle_num - 1], 2),
+                round(totals[cycle_num - 1], 2)
+            ]
+            ws.append(row_data)  # openpyxl 的 append 會自動尋找下一列空格寫入
+            
+    wb.save(file_name)
+
+def measure_color_change_time(total_cycles=5, excel_file="Test_Results.xlsx"):
     target_title = "RF Switch Tool V3.0_build_2605180942"
     
     try:
@@ -68,7 +102,6 @@ def measure_color_change_time(total_cycles=5):
             curr_btn = buttons[current_num]
             prev_btn = buttons[prev_num]
             
-            # 【核心修正】點擊前先截取當下的基準顏色，作為變色比對依據
             base_curr_color = get_pixel_color(hdc, curr_btn["x"], curr_btn["y"])
             base_prev_color = get_pixel_color(hdc, prev_btn["x"], prev_btn["y"])
             
@@ -85,11 +118,9 @@ def measure_color_change_time(total_cycles=5):
                 prev_color = get_pixel_color(hdc, prev_btn["x"], prev_btn["y"])
                 current_time = time.perf_counter()
                 
-                # 監測 1: 前按鈕是否變色（回復原狀）
                 if prev_recover_time is None and is_color_changed(base_prev_color, prev_color):
                     prev_recover_time = current_time
                 
-                # 監測 2: 當前按鈕是否成功變色
                 if curr_change_time is None and is_color_changed(base_curr_color, curr_color):
                     curr_change_time = current_time
                     success = True
@@ -112,18 +143,26 @@ def measure_color_change_time(total_cycles=5):
                 
                 print(f"  [按鈕 {current_num}] 前鈕回復: {p_recover_ms:.1f}ms | 新鈕變色: {c_change_ms:.1f}ms | 總計: {total_ms:.1f}ms")
             else:
+                # 逾時也填入空數據維持格式一致
+                all_records[current_num]["prev_recover"].append(0.0)
+                all_records[current_num]["curr_change"].append(0.0)
+                all_records[current_num]["total"].append(0.0)
                 print(f"  [按鈕 {current_num}] 測試逾時，顏色未發生顯著改變。")
                 
             time.sleep(0.05)
             
+        # 【修改點】每一輪結束，立即將該輪數據存入 Excel 後一列
+        log_to_excel(excel_file, cycle, all_records)
+        print(f"  第 {cycle:03d} 輪測試數據已即時寫入 Excel。")
+
         print("\n" + "-"*85)
         print(f" 【 第 {cycle:03d} 輪結束即時累計統計結果 】")
         print("-"*85)
         print(f"{'按鈕編號':<10}{'成功次數':<10}{'前鈕恢復平均(ms)':<16}{'新鈕變色平均(ms)':<16}{'總耗時平均(ms)':<15}{'最快(ms)':<10}{'最慢(ms)':<10}")
         for num in range(1, 9):
-            totals = all_records[num]["total"]
-            p_recovers = all_records[num]["prev_recover"]
-            c_changes = all_records[num]["curr_change"]
+            totals = [t for t in all_records[num]["total"] if t > 0] # 排除逾時的0
+            p_recovers = [p for p in all_records[num]["prev_recover"] if p > 0]
+            c_changes = [c for c in all_records[num]["curr_change"] if c > 0]
             if totals:
                 print(f"Btn {num:<6}{len(totals):<12}{np.mean(p_recovers):<18.2f}{np.mean(c_changes):<18.2f}{np.mean(totals):<16.2f}{np.min(totals):<12.2f}{np.max(totals):<12.2f}")
             else:
@@ -133,4 +172,5 @@ def measure_color_change_time(total_cycles=5):
     win32gui.ReleaseDC(0, hdc)
 
 if __name__ == "__main__":
-    measure_color_change_time(total_cycles=3)
+    # 你可以在這裡更改儲存的 Excel 檔名
+    measure_color_change_time(total_cycles=5, excel_file="RF_Switch_Test_Results.xlsx")
