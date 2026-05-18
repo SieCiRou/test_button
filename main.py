@@ -15,10 +15,13 @@ def get_pixel_color(hdc, x, y):
 def is_steel_blue(rgb):
     """判斷顏色是否接近 SteelBlue (標準 RGB 約為 70, 130, 180)"""
     r, g, b = rgb
-    # 允許些許誤差範圍 (例如 R 在 50~90, G 在 110~150, B 在 160~200)
     return (50 <= r <= 95) and (110 <= g <= 150) and (160 <= b <= 210)
 
-def measure_color_change_time():
+def measure_color_change_time(total_cycles=5):
+    """
+    Args:
+        total_cycles (int): 要測試的總輪數（次數）
+    """
     target_title = "RF Switch Tool V3.0_build_2605180942"
     
     try:
@@ -49,12 +52,11 @@ def measure_color_change_time():
             win32gui.ReleaseDC(0, hdc)
             return
 
-    # 紀錄所有測試時間數據
-    all_records = {num: [] for num in range(1, 9)}
-    total_cycles = 100  # 總共跑 100 輪
+    # 紀錄所有測試時間數據 (細分為：前鈕恢復時間, 新鈕變色時間, 總耗時)
+    all_records = {num: {"prev_recover": [], "curr_change": [], "total": []} for num in range(1, 9)}
     timeout_limit = 2.0  # 2秒逾時防呆
     
-    print(f"\n 開始執行 8 個按鈕輪流點選測試 (共 {total_cycles} 輪) ...")
+    print(f"\n開始執行 8 個按鈕輪流點選測試 (共設定測試 {total_cycles} 輪) ...")
     
     # 為了讓第一輪的第一個按鈕有「前一個按鈕」可以比對，先預踩第 8 個按鈕
     print("正在設定初始狀態（預點擊第 8 個按鈕）...")
@@ -62,68 +64,78 @@ def measure_color_change_time():
     time.sleep(0.5)
     
     for cycle in range(1, total_cycles + 1):
-        print(f"\n--- 🔄 第 {cycle:03d} / {total_cycles} 輪測試 ---")
+        print(f"\n--- 第 {cycle:03d} / {total_cycles} 輪測試 ---")
         
         for current_num in range(1, 9):
-            # 確定當前按鈕與前一個按鈕的編號
             prev_num = 8 if current_num == 1 else current_num - 1
             
             curr_btn = buttons[current_num]
             prev_btn = buttons[prev_num]
             
-            # 取得點擊前的初始顏色狀態
-            init_curr_color = get_pixel_color(hdc, curr_btn["x"], curr_btn["y"])
-            init_prev_color = get_pixel_color(hdc, prev_btn["x"], prev_btn["y"])
-            
             # 執行真實滑鼠點擊
             curr_btn["obj"].click_input()
             start_time = time.perf_counter()
             
-            # 高速輪詢監測顏色轉變
+            prev_recover_time = None
+            curr_change_time = None
             success = False
+            
+            # 高速輪詢監測顏色轉變
             while True:
                 curr_color = get_pixel_color(hdc, curr_btn["x"], curr_btn["y"])
                 prev_color = get_pixel_color(hdc, prev_btn["x"], prev_btn["y"])
                 current_time = time.perf_counter()
                 
-                # 判定條件：
-                # 1. 前一個按鈕已經回復原色 (不再是 steelblue，或者顏色變回跟目前按鈕點擊前一樣)
-                # 2. 目前按鈕已經成功轉變成 SteelBlue 色
-                if is_steel_blue(curr_color) and (not is_steel_blue(prev_color)):
-                    end_time = current_time
+                # 監測 1: 原(前)按鈕是否變回原色
+                if prev_recover_time is None and (not is_steel_blue(prev_color)):
+                    prev_recover_time = current_time
+                
+                # 監測 2: 新(當前)按鈕是否轉變為 SteelBlue 色
+                if curr_change_time is None and is_steel_blue(curr_color):
+                    curr_change_time = current_time
                     success = True
-                    break
-                    
+                    break  # 只要當前按鈕變色為 SteelBlue，即視為成功並結束輪詢
+                
                 if (current_time - start_time) > timeout_limit:
                     break
             
             if success:
-                duration_ms = (end_time - start_time) * 1000
-                all_records[current_num].append(duration_ms)
-                print(f"  [按鈕 {current_num}] 變色耗時: {duration_ms:.2f} ms")
+                # 若前鈕尚未在時限內恢復，則補計當前時間以防計算出錯
+                if prev_recover_time is None:
+                    prev_recover_time = current_time
+                    
+                # 計算各階段耗時 (毫秒)
+                p_recover_ms = (prev_recover_time - start_time) * 1000
+                c_change_ms = (curr_change_time - start_time) * 1000
+                total_ms = (curr_change_time - start_time) * 1000
+                
+                all_records[current_num]["prev_recover"].append(p_recover_ms)
+                all_records[current_num]["curr_change"].append(c_change_ms)
+                all_records[current_num]["total"].append(total_ms)
+                
+                print(f"  [按鈕 {current_num}] 前鈕回復: {p_recover_ms:.1f}ms | 新鈕變色: {c_change_ms:.1f}ms | 總計: {total_ms:.1f}ms")
             else:
-                print(f"  ❌ [按鈕 {current_num}] 測試逾時，顏色未如預期改變。")
+                print(f"  [按鈕 {current_num}] 測試逾時，狀態未完全改變。")
                 
             time.sleep(0.05) # 稍微緩衝，避免 UI 反應不及
             
+        # 修正點：移至第一層 for 迴圈內。當每一輪 (1~8顆按鈕) 點完，立即列印截至目前為止的即時統計數據
+        print("\n" + "-"*85)
+        print(f" 📊 【 第 {cycle:03d} 輪結束即時累計統計結果 】")
+        print("-"*85)
+        print(f"{'按鈕編號':<10}{'成功次數':<10}{'前鈕恢復平均(ms)':<16}{'新鈕變色平均(ms)':<16}{'總耗時平均(ms)':<15}{'最快(ms)':<10}{'最慢(ms)':<10}")
+        for num in range(1, 9):
+            totals = all_records[num]["total"]
+            p_recovers = all_records[num]["prev_recover"]
+            c_changes = all_records[num]["curr_change"]
+            if totals:
+                print(f"Btn {num:<6}{len(totals):<12}{np.mean(p_recovers):<18.2f}{np.mean(c_changes):<18.2f}{np.mean(totals):<16.2f}{np.min(totals):<12.2f}{np.max(totals):<12.2f}")
+            else:
+                print(f"Btn {num:<6}{0:<12}{'N/A':<18}{'N/A':<18}{'N/A':<16}{'N/A':<12}{'N/A':<12}")
+        print("="*85)
+            
     # 2. 釋放繪圖資源
     win32gui.ReleaseDC(0, hdc)
-    
-    # 3. 輸出 100 輪結束後的完整統計報告
-    print("\n" + "="*50)
-    print(" 📊 【 8 個按鈕變色反應時間 100 次統計結果 】")
-    print("="*50)
-    print(f"{'按鈕編號':<10}{'成功次數':<10}{'平均時間 (ms)':<15}{'最快 (ms)':<10}{'最慢 (ms)':<10}")
-    print("-"*50)
-    
-    for num in range(1, 9):
-        times = all_records[num]
-        if times:
-            arr = np.array(times)
-            print(f"Btn {num:<6}{len(times):<12}{np.mean(arr):<16.2f}{np.min(arr):<12.2f}{np.max(arr):<12.2f}")
-        else:
-            print(f"Btn {num:<6}{0:<12}{'N/A':<16}{'N/A':<12}{'N/A':<12}")
-    print("="*50)
 
 if __name__ == "__main__":
-    measure_color_change_time()
+    measure_color_change_time(total_cycles=5)
