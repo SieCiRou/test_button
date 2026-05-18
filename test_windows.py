@@ -14,7 +14,7 @@ def get_pixel_color(hdc, x, y):
 
 def measure_color_change_time():
     # 正確的視窗標題字串
-    target_title = "RF Switch Tool V3.0_build_2605180942"
+    target_title = "RF Switch Tool V3.0_build_2605181137"
     
     # 1. 修正連線標題，精準連接到您的 RF 工具視窗
     try:

@@ -18,6 +18,17 @@ def get_pixel_color(hdc, x, y):
     r = color & 0xff
     return (r, g, b)
 
+def is_slate_gray(rgb):
+    """判斷是否為未選中狀態的 SlateGray (特色：R, G, B 各值比較接近，偏灰暗)"""
+    r, g, b = rgb
+    return (90 <= r <= 130) and (110 <= g <= 150) and (130 <= b <= 165)
+
+def is_steel_blue(rgb):
+    """判斷是否為真正有作用的 SteelBlue (特色：R值顯著下降，且B值比灰色更飽和)
+    此範圍已排除 LightSteelBlue (LightSteelBlue 的 R 通常大於 160，顏色太亮)"""
+    r, g, b = rgb
+    return (50 <= r <= 95) and (110 <= g <= 150) and (160 <= b <= 210)
+
 def is_color_changed(base_rgb, current_rgb):
     """比對當前顏色與點擊前是否有顯著差異"""
     return any(abs(b - c) > 15 for b, c in zip(base_rgb, current_rgb))
@@ -56,7 +67,7 @@ def log_to_excel(file_name, cycle_num, all_records):
 
 def measure_color_change_time(total_cycles=5, excel_file="Test_Results.xlsx"):
     # target_title = "RF Switch Tool V3.0_build_2605180942"
-    target_title = "RF Switch Tool V3.0_build_2605181137"
+    target_title = "RF Switch Tool V3.0_build_2605181435"
     
     try:
         app = Application(backend="win32").connect(title=target_title)
