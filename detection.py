@@ -2,7 +2,7 @@ import win32gui
 
 def show_all_active_windows():
     print("=" * 50)
-    print(" 🔍 目前系統中所有可偵測到的視窗標題清單：")
+    print(" 目前系統中所有可偵測到的視窗標題清單：")
     print("=" * 50)
     
     # 紀錄找到的視窗數量

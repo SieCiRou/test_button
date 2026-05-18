@@ -55,7 +55,8 @@ def log_to_excel(file_name, cycle_num, all_records):
     wb.save(file_name)
 
 def measure_color_change_time(total_cycles=5, excel_file="Test_Results.xlsx"):
-    target_title = "RF Switch Tool V3.0_build_2605180942"
+    # target_title = "RF Switch Tool V3.0_build_2605180942"
+    target_title = "RF Switch Tool V3.0_build_2605181137"
     
     try:
         app = Application(backend="win32").connect(title=target_title)
@@ -106,9 +107,9 @@ def measure_color_change_time(total_cycles=5, excel_file="Test_Results.xlsx"):
             base_prev_color = get_pixel_color(hdc, prev_btn["x"], prev_btn["y"])
             
             curr_btn["obj"].click_input()
+            start_time = time.perf_counter()
             win32api.SetCursorPos((0, 0))
             
-            start_time = time.perf_counter()
             prev_recover_time = None
             curr_change_time = None
             success = False
