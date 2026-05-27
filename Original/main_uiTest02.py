@@ -89,7 +89,7 @@ def measure_color_change_time(total_cycles=5, excel_file="RF_Results.xlsx"):
             while (time.perf_counter() - t0) < 2.0:
                 now = time.perf_counter()
                 
-                # 多點掃描：只要其中一點符合顏色就算成功
+                # 多點掃描：符合顏色就算成功
                 if t_curr is None:
                     for px, py in curr_b["points"]:
                         if is_steel_blue(get_pixel_color(hdc, px, py)):
