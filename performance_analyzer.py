@@ -33,7 +33,7 @@ class FlexiblePerformanceAnalyzer:
             self.df_a = self.df_a[self.df_a[self.target_column] > 0].dropna(subset=[self.target_column])
             self.df_b = self.df_b[self.df_b[self.target_column] > 0].dropna(subset=[self.target_column])
             
-            print(f"✅ 數據載入成功！[{self.label_a}] 有效樣本：{len(self.df_a)}筆 | [{self.label_b}] 有效樣本：{len(self.df_b)}筆")
+            print(f"數據載入成功！[{self.label_a}] 有效樣本：{len(self.df_a)}筆 | [{self.label_b}] 有效樣本：{len(self.df_b)}筆")
         except Exception as e:
             raise ValueError(f"資料讀取或清洗失敗: {e}")
 
@@ -117,7 +117,7 @@ class FlexiblePerformanceAnalyzer:
         
         header_html = f"""
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 25px; background-color: #fdfdfd; border-bottom: 3px solid #eef2f5;">
-            <h2 style="color: #2c3e50; margin: 0 0 10px 0;">📊 多維度數據效能對比 Dashboard</h2>
+            <h2 style="color: #2c3e50; margin: 0 0 10px 0;">多維度數據效能對比 Dashboard</h2>
             <p style="color: #7f8c8d; margin: 0; font-size:14px;">對比欄位：<strong style="color:#333;">{col}</strong> | 基準組：{self.label_a} 🆚 對比組：{self.label_b}</p>
             
             <div style="display: flex; gap: 20px; margin-top: 20px;">
@@ -216,7 +216,7 @@ class FlexiblePerformanceAnalyzer:
             f.write(fig.to_html(full_html=False, include_plotlyjs='cdn'))
             f.write(notes_html)
             
-        print(f"🎉 完整的 Dashboard 已生成！請至以下路徑打開 HTML 檔案：\n👉 {os.path.abspath(output_filename)}")
+        print(f"Dashboard 已生成！請至以下路徑打開 HTML 檔案：\n {os.path.abspath(output_filename)}")
 
 # ==========================================
 # 執行入口

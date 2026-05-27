@@ -44,7 +44,7 @@ def log_to_excel(file_name, cycle_num, all_records):
     wb.save(file_name)
 
 def measure_color_change_time(total_cycles=5, excel_file="RF_Results.xlsx"):
-    target_title = "RF Switch Tool V3.0_build_2605180942"
+    target_title = "RF Switch Tool V3.0_build_2605261557"
     try:
         app = Application(backend="win32").connect(title=target_title)
     except:
@@ -72,7 +72,7 @@ def measure_color_change_time(total_cycles=5, excel_file="RF_Results.xlsx"):
     # 初始狀態：點擊 8
     buttons[8]["obj"].click_input()
     win32api.SetCursorPos((0, 0))
-    time.sleep(0.5)
+    time.sleep(1)
 
     for cycle in range(1, total_cycles + 1):
         print(f"\n--- 第 {cycle} 輪 ---")
@@ -121,4 +121,4 @@ def measure_color_change_time(total_cycles=5, excel_file="RF_Results.xlsx"):
     win32gui.ReleaseDC(0, hdc)
 
 if __name__ == "__main__":
-    measure_color_change_time(total_cycles=15)
+    measure_color_change_time(total_cycles=2)
