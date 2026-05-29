@@ -2,7 +2,7 @@ import re
 from base_tester import RFTesterCore
 
 class RFSwitchTool:
-    def __init__(self, title="RF Switch Tool V3.0_build_2605261557"):
+    def __init__(self, title="RF Switch Tool V3.0_build_2605191621"):
         self.tester = RFTesterCore(title)
 
     def _extract_number(self, auto_id):

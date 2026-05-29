@@ -41,7 +41,7 @@ def run_dynamic_test(pattern_type="normal", total_cycles=2, excel_file="RF_test0
             record_row = [f"第 {cycle} 輪", f"第 {i+1} 步", curr_id_name, round(res_prev, 2), round(res_curr, 2), round(res_curr, 2)]
             tool.tester.log_to_excel(excel_file, cycle, record_row)
             
-            time.sleep(0.1)
+            time.sleep(1)
 
     tool.tester.close()
 

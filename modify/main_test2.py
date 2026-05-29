@@ -78,7 +78,7 @@ def run_dynamic_pattern_test(total_cycles=2, excel_file="RF_test02_Results.xlsx"
             ]
             tool.tester.log_to_excel(excel_file, cycle, record_row)
             
-            time.sleep(0.1)
+            time.sleep(1)
 
     # 釋放 Win32 資源
     tool.tester.close()
