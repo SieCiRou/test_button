@@ -24,7 +24,7 @@ def generate_plus1_minus1_plus2_sequence(total_btns):
         
     return seq
 
-def run_dynamic_pattern_test(total_cycles=2, excel_file="RF_Dynamic_Pattern_Results.xlsx"):
+def run_dynamic_pattern_test(total_cycles=2, excel_file="RF_test02_Results.xlsx"):
     # 1. 初始化工具並自動探索 UI 上的所有按鈕
     tool = RFSwitchTool()
     total_btns = tool.auto_discover_buttons()

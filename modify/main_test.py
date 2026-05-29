@@ -2,7 +2,7 @@
 import time
 from main import RFSwitchTool
 
-def run_dynamic_test(pattern_type="normal", total_cycles=2, excel_file="RF_Dynamic_Results.xlsx"):
+def run_dynamic_test(pattern_type="normal", total_cycles=2, excel_file="RF_test01_Results.xlsx"):
     # 1. 初始化工具
     tool = RFSwitchTool()
     

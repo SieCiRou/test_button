@@ -1,7 +1,7 @@
 import time
 from main import RFSwitchTool
 
-def run_btn_test(total_cycles=2, excel_file="RF_Button_Test_Results.xlsx"):
+def run_btn_test(total_cycles=2, excel_file="RF_test03_Results.xlsx"):
     # 初始化並自動探索 UI 上的所有按鈕
     tool = RFSwitchTool()
     total_btns = tool.auto_discover_buttons()
