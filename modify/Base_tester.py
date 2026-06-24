@@ -95,16 +95,29 @@ class RFTesterCore:
         res_curr = (t_curr - t0) * 1000 if t_curr else 0
         return res_prev, res_curr
 
-    def log_to_excel(self, file_name, cycle_num, record_row):
-        headers = ['輪次', '邏輯順序', '按鈕實體ID', '前鈕恢復時間(ms)', '新鈕變色時間(ms)', '總耗時(ms)','測試時間']
+    def log_to_excel(self, file_name, cycle_num, record_row, sheet_name="常規規律測試"):
+        # 💡 修正：動態決定不同測試類型的欄位標題
+        if "單鈕" in sheet_name:
+            headers = ['輪次', '按鈕實體ID', '識別代碼', '變藍耗時(ms)', '變灰耗時(ms)', '總耗時(ms)', '測試時間']
+        else:
+            headers = ['輪次', '邏輯順序', '按鈕實體ID', '前鈕恢復時間(ms)', '新鈕變色時間(ms)', '總耗時(ms)', '測試時間']
+
+        # 自動補足當前系統時間戳記
+        if len(record_row) < len(headers):
+            record_row.append(time.strftime("%Y-%m-%d %H:%M:%S"))
+
         if not os.path.exists(file_name):
             wb = Workbook()
             ws = wb.active
-            ws.title = "測試結果"
+            ws.title = sheet_name
             ws.append(headers)
         else:
             wb = load_workbook(file_name)
-            ws = wb.active
+            if sheet_name in wb.sheetnames:
+                ws = wb[sheet_name]
+            else:
+                ws = wb.create_sheet(title=sheet_name)
+                ws.append(headers)
 
         ws.append(record_row)
         wb.save(file_name)

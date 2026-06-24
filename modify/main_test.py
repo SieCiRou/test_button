@@ -32,19 +32,16 @@ def run_dynamic_test(pattern_type="normal", total_cycles=2, excel_file="RF_test0
             prev_idx = test_sequence[i - 1]
             curr_id_name = tool.tester.buttons[curr_idx]["id_name"]
             
-            # 量測時間
             res_prev, res_curr = tool.tester.measure_switch(curr_idx, prev_idx)
             
             status = "成功" if res_curr > 0 else "逾時"
             print(f"  [步驟 {i+1}] 目前按鈕 ({curr_id_name}) -> {status}: {res_curr:.1f}ms")
             
-            # 取得當前時間（格式例如：2026-06-24 09:47:15）
             current_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-            # 寫入 Excel
             record_row = [f"第 {cycle} 輪", f"第 {i+1} 步", curr_id_name, round(res_prev, 2), round(res_curr, 2), round(res_curr, 2), current_time_str]
-            tool.tester.log_to_excel(excel_file, cycle, record_row, sheet_name="常規規律測試")
             
+            # 💡 帶入正確的分頁名稱
+            tool.tester.log_to_excel(excel_file, cycle, record_row, sheet_name="常規規律測試")
             time.sleep(1)
 
     tool.tester.close()

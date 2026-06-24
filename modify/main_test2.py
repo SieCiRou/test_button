@@ -54,38 +54,24 @@ def run_dynamic_pattern_test(total_cycles=2, excel_file="RF_test02_Results.xlsx"
     # 執行多輪測試 (預設為 2 輪)
     for cycle in range(1, total_cycles + 1):
         print(f"\n--- [動態規律] 第 {cycle} 輪測試開始 ---")
-        
         for i, curr_idx in enumerate(test_sequence):
-            # 自動閉環：前一個按鈕永遠是序列中的前一格
             prev_idx = test_sequence[i - 1]
-            
             curr_id_name = tool.tester.buttons[curr_idx]["id_name"]
-            prev_id_name = tool.tester.buttons[prev_idx]["id_name"]
-
-            # 取得當前時間（格式例如：2026-06-24 09:47:15）
-            current_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-            # 執行時間量測
             res_prev, res_curr = tool.tester.measure_switch(curr_idx, prev_idx)
-            
             status = "成功" if res_curr > 0 else "逾時"
-            print(f"  [步驟 {i+1}] 切換至 {curr_id_name} (前鈕 {prev_id_name}) -> {status}: {res_curr:.1f}ms")
+            print(f"  [步驟 {i+1}] 切換至 {curr_id_name} -> {status}: {res_curr:.1f}ms")
             
-            # 寫入 Excel 報表
+            current_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             record_row = [
-                f"第 {cycle} 輪", 
-                f"第 {i+1} 步 (鈕 {human_sequence[i]})", 
-                curr_id_name, 
-                round(res_prev, 2), 
-                round(res_curr, 2), 
-                round(res_curr, 2),
-                current_time_str
+                f"第 {cycle} 輪", f"第 {i+1} 步 (鈕 {human_sequence[i]})", 
+                curr_id_name, round(res_prev, 2), round(res_curr, 2), round(res_curr, 2), current_time_str
             ]
-            tool.tester.log_to_excel(excel_file, cycle, record_row)
             
+            # 💡 核心修正點：顯式指定寫入 特殊規律測試 分頁
+            tool.tester.log_to_excel(excel_file, cycle, record_row, sheet_name="特殊規律測試")
             time.sleep(1)
 
-    # 釋放 Win32 資源
     tool.tester.close()
     print(f"\n測試完成！結果已儲存至 {excel_file}")
 
