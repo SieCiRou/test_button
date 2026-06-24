@@ -8,8 +8,8 @@
             .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px; }
             h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-top: 0; }
             .meta-info { color: #7f8c8d; font-size: 0.9em; margin-bottom: 20px; }
-            .dashboard { display: flex; gap: 20px; margin-bottom: 20px; wrap: wrap; }
-            .card { flex: 1; min-width: 250px; background: #fff; border-left: 5px solid #3498db; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 4px; background-color: #fafbfc; }
+            .dashboard { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+            .card { flex: 1; min-width: 280px; background: #fff; border-left: 5px solid #3498db; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 4px; background-color: #fafbfc; }
             .card h3 { margin-top: 0; color: #2c3e50; font-size: 1.1em; }
             .chart-container { text-align: center; margin-top: 30px; }
             .chart-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -21,18 +21,35 @@
             <h1>📡 RF Switch Tool 自動化測試整合報告</h1>
             <div class="meta-info">
                 <p>📊 數據來源原始檔：<b>RF_All_Tests_Results_20260624.xlsx</b></p>
-                <p>⏱ 報告產出時間：<b>2026-06-24 11:36:07</b></p>
+                <p>⏱ 報告產出時間：<b>2026-06-24 13:14:34</b></p>
             </div>
-            
             <div class="dashboard">
                 
+            <div class='card'>
+                <h3>🟢 常規規律測試總結</h3>
+                <p>總測試步數：<b>12</b> 步</p>
+                <p>平均新鈕變色反應時間：<b style='color:#2ecc71;'>64.10 ms</b></p>
+                <p>最大延遲點：<b>114.70 ms</b></p>
             </div>
             
+            <div class='card'>
+                <h3>🟠 特殊規律測試總結</h3>
+                <p>總測試步數：<b>18</b> 步</p>
+                <p>平均新鈕變色反應時間：<b style='color:#e67e22;'>65.91 ms</b></p>
+                <p>最大延遲點：<b>186.03 ms</b></p>
+            </div>
+            
+            <div class='card'>
+                <h3>🔵 單鈕自我切換測試總結</h3>
+                <p>平均點擊變藍(ON)耗時：<b>27.74 ms</b></p>
+                <p>平均恢復變灰(OFF)耗時：<b>44.13 ms</b></p>
+            </div>
+            
+            </div>
             <div class="chart-container">
                 <h2>📈 數據視覺化圖表</h2>
-                <img src="RF_Report_20260624_113606.png" alt="測試統計圖表">
+                <img src="UIUSBv6000_Report_20260624_131432.png" alt="測試統計圖表">
             </div>
-            
             <div class="footer">
                 RF Switch Tool 自動化測試流水線系統 • 自動生成報告
             </div>

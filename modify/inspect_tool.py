@@ -87,6 +87,6 @@ if __name__ == "__main__":
     
     # 2. 自動偵測：你可以在這裡輸入你在上方清單看到的實際 Title 
     # (例如你上次抓到的: RF Switch Tool V3.0_build_2605191621)
-    CURRENT_SOFTWARE_TITLE = "RF Switch Tool V2.0_build_2605051112" 
+    CURRENT_SOFTWARE_TITLE = "RF Switch Tool V1.2_build_2606241523" 
     
     inspect_and_generate_config(CURRENT_SOFTWARE_TITLE)
