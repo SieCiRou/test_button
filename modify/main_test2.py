@@ -61,6 +61,9 @@ def run_dynamic_pattern_test(total_cycles=2, excel_file="RF_test02_Results.xlsx"
             
             curr_id_name = tool.tester.buttons[curr_idx]["id_name"]
             prev_id_name = tool.tester.buttons[prev_idx]["id_name"]
+
+            # 取得當前時間（格式例如：2026-06-24 09:47:15）
+            current_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
             # 執行時間量測
             res_prev, res_curr = tool.tester.measure_switch(curr_idx, prev_idx)
@@ -76,7 +79,7 @@ def run_dynamic_pattern_test(total_cycles=2, excel_file="RF_test02_Results.xlsx"
                 round(res_prev, 2), 
                 round(res_curr, 2), 
                 round(res_curr, 2),
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                current_time_str
             ]
             tool.tester.log_to_excel(excel_file, cycle, record_row)
             

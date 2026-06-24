@@ -43,7 +43,7 @@ def run_dynamic_test(pattern_type="normal", total_cycles=2, excel_file="RF_test0
 
             # 寫入 Excel
             record_row = [f"第 {cycle} 輪", f"第 {i+1} 步", curr_id_name, round(res_prev, 2), round(res_curr, 2), round(res_curr, 2), current_time_str]
-            tool.tester.log_to_excel(excel_file, cycle, record_row)
+            tool.tester.log_to_excel(excel_file, cycle, record_row, sheet_name="常規規律測試")
             
             time.sleep(1)
 
