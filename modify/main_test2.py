@@ -1,5 +1,6 @@
-# test_dynamic_pattern.py
+# main_test2.py     規律切換測試 +1, -1, +2
 import time
+from datetime import datetime
 from main import RFSwitchTool
 
 def generate_plus1_minus1_plus2_sequence(total_btns):
@@ -74,7 +75,8 @@ def run_dynamic_pattern_test(total_cycles=2, excel_file="RF_test02_Results.xlsx"
                 curr_id_name, 
                 round(res_prev, 2), 
                 round(res_curr, 2), 
-                round(res_curr, 2)
+                round(res_curr, 2),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             ]
             tool.tester.log_to_excel(excel_file, cycle, record_row)
             

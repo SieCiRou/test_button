@@ -96,7 +96,7 @@ class RFTesterCore:
         return res_prev, res_curr
 
     def log_to_excel(self, file_name, cycle_num, record_row):
-        headers = ['輪次', '邏輯順序', '按鈕實體ID', '前鈕恢復時間(ms)', '新鈕變色時間(ms)', '總耗時(ms)']
+        headers = ['輪次', '邏輯順序', '按鈕實體ID', '前鈕恢復時間(ms)', '新鈕變色時間(ms)', '總耗時(ms)','測試時間']
         if not os.path.exists(file_name):
             wb = Workbook()
             ws = wb.active

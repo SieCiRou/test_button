@@ -1,4 +1,6 @@
+# main_test3.py 單鈕自我 ON/OFF 測試
 import time
+from datetime import datetime
 from main import RFSwitchTool
 
 def run_btn_test(total_cycles=2, excel_file="RF_test03_Results.xlsx"):
@@ -76,6 +78,7 @@ def run_btn_test(total_cycles=2, excel_file="RF_test03_Results.xlsx"):
                 round(res_on, 2),   # 變藍耗時
                 round(res_off, 2),  # 變灰耗時
                 round(res_on + res_off, 2) # 單鈕總互動耗時
+                ,datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # 測試時間
             ]
             
             # 這裡微調一下寫入的 Header 辨識度

@@ -1,5 +1,6 @@
 # main_test.py
 import time
+from datetime import datetime
 from main import RFSwitchTool
 
 def run_dynamic_test(pattern_type="normal", total_cycles=2, excel_file="RF_test01_Results.xlsx"):
@@ -37,8 +38,11 @@ def run_dynamic_test(pattern_type="normal", total_cycles=2, excel_file="RF_test0
             status = "成功" if res_curr > 0 else "逾時"
             print(f"  [步驟 {i+1}] 目前按鈕 ({curr_id_name}) -> {status}: {res_curr:.1f}ms")
             
+            # 取得當前時間（格式例如：2026-06-24 09:47:15）
+            current_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
             # 寫入 Excel
-            record_row = [f"第 {cycle} 輪", f"第 {i+1} 步", curr_id_name, round(res_prev, 2), round(res_curr, 2), round(res_curr, 2)]
+            record_row = [f"第 {cycle} 輪", f"第 {i+1} 步", curr_id_name, round(res_prev, 2), round(res_curr, 2), round(res_curr, 2), current_time_str]
             tool.tester.log_to_excel(excel_file, cycle, record_row)
             
             time.sleep(1)
